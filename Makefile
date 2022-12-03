@@ -9,6 +9,9 @@ webpack_mode := production
 go_ldflags := -ldflags="-s -w"
 endif
 
+.PHONY: all
+all: backend/backend
+
 frontend/node_modules: frontend/package.json frontend/package-lock.json
 	cd frontend && npm install
 	touch $@
@@ -29,3 +32,7 @@ build-frontend: backend/dist/main.js backend/dist/index.html
 .PHONY: run
 run: backend/backend
 	./$<
+
+.PHONY: clean
+clean:
+	rm -f backend/backend
