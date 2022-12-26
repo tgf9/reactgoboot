@@ -4,10 +4,14 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.js$/,
+        test: /\.(js|jsx)$/,
         include: path.resolve(__dirname, "src"),
+        exclude: /node_modules/,
         loader: "babel-loader",
       },
     ],
+  },
+  resolve: {
+    extensions: ["*", ".js", ".jsx"],
   },
 };
