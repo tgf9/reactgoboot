@@ -5,50 +5,33 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/tgf9/reactgoboot/dist"
+	"github.com/tgf9/reactgoboot/public"
 )
 
-func handleMainJS(rw http.ResponseWriter, r *http.Request) {
-	log.Println("handleMainJS", r.Method, r.URL.Path)
+func serveFile(name, contentType string) http.HandlerFunc {
+	return func(rw http.ResponseWriter, r *http.Request) {
+		fd, err := public.FS.Open(name)
+		if err != nil {
+			http.Error(rw, "Internal Server Error", http.StatusInternalServerError)
+			log.Printf("serveFile: failed to open %s: %s", name, err)
+			return
+		}
+		defer fd.Close()
 
-	fd, err := dist.FS.Open("main.js")
-	if err != nil {
-		http.Error(rw, "Internal Server Error", http.StatusInternalServerError)
-		log.Println(err)
-		return
-	}
-	defer fd.Close()
+		rw.Header().Set("Content-Type", contentType)
 
-	rw.Header().Set("Content-Type", "text/javascript; charset=utf-8")
-	if _, err := io.Copy(rw, fd); err != nil {
-		http.Error(rw, "Internal Server Error", http.StatusInternalServerError)
-		log.Println(err)
-		return
-	}
-}
-
-func handleIndex(rw http.ResponseWriter, r *http.Request) {
-	log.Println("handleIndex", r.Method, r.URL.Path)
-
-	fd, err := dist.FS.Open("index.html")
-	if err != nil {
-		http.Error(rw, "Internal Server Error", http.StatusInternalServerError)
-		log.Println(err)
-		return
-	}
-	defer fd.Close()
-
-	rw.Header().Set("Content-Type", "text/html; charset=utf-8")
-	if _, err := io.Copy(rw, fd); err != nil {
-		http.Error(rw, "Internal Server Error", http.StatusInternalServerError)
-		log.Println(err)
-		return
+		if _, err := io.Copy(rw, fd); err != nil {
+			http.Error(rw, "Internal Server Error", http.StatusInternalServerError)
+			log.Printf("serveFile: failed to copy %s: %s", name, err)
+			return
+		}
 	}
 }
 
 func main() {
-	http.HandleFunc("/main.js", handleMainJS)
-	http.HandleFunc("/", handleIndex)
+	http.HandleFunc("/index.js", serveFile("index.js", "text/javascript; charset=utf-8"))
+	http.HandleFunc("/index.css", serveFile("index.css", "text/css; charset=utf-8"))
+	http.HandleFunc("/", serveFile("index.html", "text/html; charset=utf-8"))
 
 	if err := http.ListenAndServe(":8080", nil); err != nil {
 		log.Fatalln(err)

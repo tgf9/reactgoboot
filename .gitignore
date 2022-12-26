@@ -1,4 +1,4 @@
 /backend/backend
-/backend/dist/main.js
-/backend/dist/index.html
+/backend/public/*
+!/backend/public/public.go
 tags
