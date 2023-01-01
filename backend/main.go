@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/tgf9/reactgoboot/public"
+	"github.com/tgf9/reactgoapp/public"
 )
 
 func serveFile(name, contentType string) http.HandlerFunc {
