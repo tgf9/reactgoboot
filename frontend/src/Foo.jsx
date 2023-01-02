@@ -1,5 +1,9 @@
 import React from "react";
 
 export default function Foo(props) {
-  return <p className="text-base">Hello, Foo!</p>;
+  return (
+    <div className="container mx-auto">
+	  <p className="text-4xl">Hello, Foo!</p>
+    </div>
+  );
 };
