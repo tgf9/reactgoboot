@@ -2,9 +2,11 @@ js_src = $(shell find frontend/tailwind.config.js frontend/src -name "*.js" -o -
 go_src = $(shell find backend -name "*.go")
 
 go_ldflags :=
+esbuild_flags :=
 
 ifeq ($(strip $(rel)),1)
 go_ldflags := -ldflags="-s -w"
+esbuild_flags := --minify
 endif
 
 .PHONY: all
@@ -16,7 +18,7 @@ frontend/node_modules: frontend/package.json frontend/package-lock.json
 
 backend/public/index.js: frontend/node_modules $(js_src)
 	cd frontend && ./node_modules/.bin/esbuild src/index.jsx --bundle \
-		--minify --outfile=/tmp/$(notdir $@)
+		$(esbuild_flags) --outfile=/tmp/$(notdir $@)
 	mv /tmp/$(notdir $@) $@
 
 backend/public/index.html: frontend/src/index.html
